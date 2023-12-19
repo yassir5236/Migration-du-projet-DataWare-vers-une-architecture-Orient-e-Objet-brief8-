@@ -1,36 +1,28 @@
 <?php
-
 session_start();
 if (!isset($_SESSION['utilisateur']['id'])) {
     header("Location:../Deconnexion.php ");
 }
 
+
+
+
+
+
 include("../config/database.php");
 include("../classes/Team.php");
-$id_utilisateur = $_SESSION['utilisateur']['id'];
 
+// Initialisation de la base de données
 $database = new Database();
-$projetInstance = new Team($database);
+$conn = $database->getConnection();
 
-$resultat = $projetInstance->getEquipesByUserId($id_utilisateur);
+// Initialisation de la classe Equipe
+$equipeManager = new Team($database);
+
+$equipes = $equipeManager->getAllEquipes();
+
+
 ?>
-
-<script>
-
-    var gh= new XMLHttpRequest();
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -40,12 +32,13 @@ $resultat = $projetInstance->getEquipesByUserId($id_utilisateur);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
-    <script src="../script.js" defer></script>
+
     <title>dataware | equipe</title>
 </head>
 
 <body class="bg-[#ECECF8]">
 
+   
 
     <header class="sticky flex  justify-between top-0 bg-[#7393B3] p-4">
         <a href="Dashboard.php" class="flex items-center text-white">
@@ -71,20 +64,9 @@ $resultat = $projetInstance->getEquipesByUserId($id_utilisateur);
         </div>
     </header>
 
-    <!-- Menu burger pour la version mobile -->
-    <div id="burgerOverlay"
-        class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden items-center justify-center sm:hidden">
-        <nav class="flex flex-col items-center">
-            <a href="projet.php" class="text-white  py-2 transition duration-300">Projets</a>
-            <a href="equipe.php" class="text-white  py-2  transition duration-300">Équipes</a>
-            <a href="../Deconnexion.php" class="text-white  py-2  transition duration-300">Déconnexion</a>
-        </nav>
-    </div>
-
     <div class="flex-1 flex flex-col h-screen">
         <div class="container mx-auto p-6">
             <h1 class="text-3xl text-center font-bold text-gray-800 mb-6">teams Management</h1>
-
 
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -93,42 +75,31 @@ $resultat = $projetInstance->getEquipesByUserId($id_utilisateur);
                             <th scope="col" class="px-6 py-3">Nom d'équipes</th>
                             <th scope="col" class="px-6 py-3">Projet</th>
                             <th scope="col" class="px-6 py-3">Scrum Master</th>
-                            <th scope="col" class="px-6 py-3">Membres</th>
                             <th scope="col" class="px-6 py-3">date de création</th>
-
                         </tr>
                     </thead>
                     <tbody>
-
                         <?php
-                        foreach ($resultat as $row) {
-
-                            echo " 
-                                <tr class=\"bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50
-                                dark:hover:bg-gray-600 \">
-                                <td scope=\"row\" class=\" px-6 py-4 text-gray-900 whitespace-nowrap
-                                    dark:text-white\">{$row['nom_equipe']}</td>
-                                <td class=\"py-2 px-4 border-b\">{$row['nom_projet']}</td>
-                                <td class=\"px-6 py-4 border-b\">{$row['scrum_master']}</td>
-                                <td class=\"px-6 py-4 border-b\">{$row['membres']}</td>
-                                <td class=\"px-6 py-4 border-b\">{$row['date_creation']}</td>
+                        foreach ($equipes as $equipe) {
+                            echo "
+                                <tr class=\"bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 \">
+                                    <td scope=\"row\" class=\" px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white\">{$equipe['nom_equipe']}</td>
+                                    <td class=\"py-2 px-4 border-b\">{$equipe['nom_projet']}</td>
+                                    <td class=\"px-6 py-4 border-b\">{$equipe['scrum_master']}</td>
+                                    <td class=\"px-6 py-4 border-b\">{$equipe['date_creation']}</td>
                                 </tr>
-                                ";
+                            ";
                         }
                         ?>
-
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    </div>
 
-    <!-- <?php
-    // $requete->close();
-    // $conn->close();
-    ?> -->
-
+    <?php
+    $requete->close();
+    ?>
 
 </body>
 

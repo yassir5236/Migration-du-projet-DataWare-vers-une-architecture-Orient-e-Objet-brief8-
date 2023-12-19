@@ -1,23 +1,43 @@
 <?php
 session_start();
-if (!isset($_SESSION['utilisateur']['id'])) {
-    header("Location:../Deconnexion.php");
+if(!isset($_SESSION['utilisateur']['id'])){
+    header("Location:../Deconnexion.php ");
 }
 
-include("../config/database.php");
-include("../classes/Project.php"); // Ajoutez l'inclusion de la classe Projet
-
-
-// Instanciation de la classe Database
-$database = new Database();
-
-$projetInstance = new Project($database); // Instanciation de la classe Projet avec la connexion PDO
+include("../Connexion.php");
 
 $id_utilisateur = $_SESSION['utilisateur']['id'];
+$sql = " SELECT
+projet.id AS projet_id,
+projet.nom AS nom_projet,
+projet.description AS description_projet,
+utilisateur.nom AS scrum_master,
+equipe.nom AS nom_equipe,
+projet.date_creation AS date_creation_projet,
+projet.date_limite AS date_limite_projet,
+projet.statut AS statut_projet
+FROM
+projet
+JOIN
+equipe ON projet.id = equipe.id_projet
+JOIN
+MembreEquipe ON equipe.id = MembreEquipe.id_equipe
+JOIN
+utilisateur ON projet.id_user = utilisateur.id
+WHERE
+MembreEquipe.id_user = ?;
 
-$resultat = $projetInstance->getProjetsByUserId($id_utilisateur);
+    ";
+
+
+$requete = $conn->prepare($sql);
+$requete->bind_param("i", $id_utilisateur);
+
+$requete->execute();
+
+$resultat = $requete->get_result();
+
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -50,10 +70,10 @@ $resultat = $projetInstance->getProjetsByUserId($id_utilisateur);
                 </button>
                 <!-- Menu de navigation pour la version desktop -->
                 <nav class="hidden sm:flex space-x-4">
-                    <!-- <a href="#" class="text-gray-200 hover:bg-[#5355] transition duration-300">Dashboard</a> -->
+                    <a href="Dashboard.php" class="text-gray-200 hover:bg-[#5355] transition duration-300">Dashboard</a>
                     <a href="projet.php" class="text-gray-200 hover:bg-[#5355] transition duration-300">Projets</a>
                     <a href="equipe.php" class="text-gray-200 hover:bg-[#5355] transition duration-300">Équipes</a>
-                    <!-- <a href="#" class="text-gray-200 hover:bg-[#5355] transition duration-300">Membres</a> -->
+                    <a href="membre.php" class="text-gray-200 hover:bg-[#5355] transition duration-300">Membres</a>
                     <a href="../Deconnexion.php"
                         class="text-gray-200 hover:bg-[#5355] transition duration-300">Déconnexion</a>
                 </nav>
@@ -64,11 +84,11 @@ $resultat = $projetInstance->getProjetsByUserId($id_utilisateur);
         <div id="burgerOverlay"
             class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center sm:hidden">
             <nav class="flex flex-col items-center">
-                <!-- <a href="Dashboard.php"
-                    class="text-gray-200 py-2 hover:bg-[#5355] transition duration-300">Dashboard</a> -->
+                <a href="Dashboard.php"
+                    class="text-gray-200 py-2 hover:bg-[#5355] transition duration-300">Dashboard</a>
                 <a href="projet.php" class="text-gray-200 py-2 hover:bg-[#5355] transition duration-300">Projets</a>
                 <a href="equipe.php" class="text-gray-200 py-2 hover:bg-[#5355] transition duration-300">Équipes</a>
-                <!-- <a href="membre.php" class="text-gray-200 py-2 hover:bg-[#5355] transition duration-300">Membres</a> -->
+                <a href="membre.php" class="text-gray-200 py-2 hover:bg-[#5355] transition duration-300">Membres</a>
                 <a href="../Deconnexion.php"
                     class="text-gray-200 py-2 hover:bg-[#5355] transition duration-300">Déconnexion</a>
             </nav>
@@ -94,9 +114,8 @@ $resultat = $projetInstance->getProjetsByUserId($id_utilisateur);
                         </thead>
                         <tbody>
                             <?php
-                            
-                            foreach ($resultat as $row) {
-                                
+                            while ($row = $resultat->fetch_assoc()) {
+
                                 echo " 
                                 <tr class=\"bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50
                                 dark:hover:bg-gray-600 \">

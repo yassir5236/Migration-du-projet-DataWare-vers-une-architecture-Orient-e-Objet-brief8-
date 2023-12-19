@@ -5,33 +5,40 @@ if (!isset($_SESSION['utilisateur']['id'])) {
     header("Location:../Deconnexion.php ");
 }
 
-include("../config/database.php");
-include("../classes/Team.php");
+include("../Connexion.php");
 $id_utilisateur = $_SESSION['utilisateur']['id'];
+$sql = "SELECT
+        equipe.nom AS nom_equipe,
+        projet.nom AS nom_projet,
+        utilisateur.nom AS scrum_master,
+        GROUP_CONCAT(DISTINCT membre.nom SEPARATOR ', ') AS membres,
+        equipe.date_creation as date_creation
+    FROM
+        equipe
+    JOIN
+        MembreEquipe ON equipe.id = MembreEquipe.id_equipe
+    JOIN
+        utilisateur ON equipe.id_user = utilisateur.id
+    JOIN
+        projet ON equipe.id_projet = projet.id
+    LEFT JOIN
+        MembreEquipe AS membre_equipe ON equipe.id = membre_equipe.id_equipe
+    LEFT JOIN
+        utilisateur AS membre ON membre_equipe.id_user = membre.id
+        where membreequipe.id_user=?
+    GROUP BY    
+        equipe.nom, utilisateur.nom, projet.nom;
+    
+    ";
 
-$database = new Database();
-$projetInstance = new Team($database);
+$requete = $conn->prepare($sql);
+$requete->bind_param("i", $id_utilisateur);
 
-$resultat = $projetInstance->getEquipesByUserId($id_utilisateur);
+$requete->execute();
+
+$resultat = $requete->get_result();
+
 ?>
-
-<script>
-
-    var gh= new XMLHttpRequest();
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -101,7 +108,7 @@ $resultat = $projetInstance->getEquipesByUserId($id_utilisateur);
                     <tbody>
 
                         <?php
-                        foreach ($resultat as $row) {
+                        while ($row = $resultat->fetch_assoc()) {
 
                             echo " 
                                 <tr class=\"bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50
@@ -124,10 +131,10 @@ $resultat = $projetInstance->getEquipesByUserId($id_utilisateur);
     </div>
     </div>
 
-    <!-- <?php
-    // $requete->close();
-    // $conn->close();
-    ?> -->
+    <?php
+    $requete->close();
+    $conn->close();
+    ?>
 
 
 </body>
