@@ -13,7 +13,7 @@ class User {
     
     
 
-    public function __construct(Database $database) {
+    public function __construct(Database $database,) {
         $this->database = $database;
     }
 
@@ -82,13 +82,13 @@ class User {
 
                 switch ($utilisateur['role']) {
                     case 'user':
-                        header("Location: ../membre/projet.php");
+                        header("Location: membre/projet.php");
                         exit();
                     case 'po':
-                        header("Location: ../owner/equipe.php");
+                        header("Location: owner/equipe.php");
                         exit();
-                    case 'scrum_master':
-                        header("Location: ./ScrumMaster/projet.php");
+                    case 'sm':
+                        header("Location: scrum/projet.php");
                         exit();
                 }
             } else {

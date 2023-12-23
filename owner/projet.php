@@ -14,16 +14,33 @@ include("../classes/Project.php");
 
 
 
-$projetManager = new Project();        // affichage des des projet pour product owner
+$projetManager = new Project();              // affichage des des projet pour product owner
 $projets = $projetManager->displayprojects();
-
-
 
 
 // Appeler la méthode deleteProject de la classe Project
 $projetManager->deleteProject();
 
-//   $projets = $projetManager->displayProjects();
+
+// Check if the form has been submitted and projectId is set
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_project'])) {
+    // Get the project ID from the form submission
+    $projectId = isset($_POST['projectId']) ? $_POST['projectId'] : null;
+
+    // Call the updateProject method with the project ID
+    $projetManager->updateProject($projectId);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -139,7 +156,7 @@ $projetManager->deleteProject();
                                                                         </button>
                                                                    
                                                                             <button type='submit' name='delete_project' id=\"deleteButton\" style=\"cursor: pointer;\" onclick=\"confirmDelete(event)\">
-                                                                           
+                                                                            <input   type=\"hidden\" name=\"projectId\" value=\"{$projet['id_projet']}\">
                                                                             <svg   xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\"
                                                                             stroke-width=\"1.5\" stroke=\"currentColor\" class=\"w-6 h-6\">
                                                                             <path stroke-linecap=\"round\" stroke-linejoin=\"round\"

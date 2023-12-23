@@ -12,6 +12,7 @@ class Project
 
     public function updateProject($projectId)
     {
+        // die ($projectId ) ;
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_project'])) {
             $sql = "SELECT * FROM projet WHERE id = ?";
             $stmt = $this->db->prepare($sql);
@@ -204,11 +205,11 @@ class Project
     public function deleteProject()
     {
 
-
+         
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_project'])) {
             $this->projectId = $_POST['projectId'];
-            // die($this->projectId);
+            // die("HELLO");
 
             // $this->db->beginTransaction();
 
@@ -301,6 +302,30 @@ class Project
         $requete = $this->db->prepare($sql);
         $requete->bindParam(1, $userId, PDO::PARAM_INT);
         $requete->execute();
+
+        return $requete->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+
+    public function getProjects()       // afficher les  projet pour scrum
+    {
+        if (!isset($_SESSION['utilisateur']['id'])) {
+            header("Location:../Deconnexion.php ");
+        }
+
+        $id_utilisateur = $_SESSION['utilisateur']['id'];
+
+        $sql = "SELECT projet.nom as nom_projet, description, projet.date_creation as date_creation, date_limite, projet.statut as statut, equipe.nom AS nom_equipe 
+                FROM projet 
+                JOIN utilisateur ON utilisateur.id = projet.id_user 
+                LEFT JOIN equipe ON projet.id = equipe.id_projet 
+                WHERE projet.id_user=?";
+
+        $requete = $this->db->prepare($sql);
+        $requete->bindParam(1, $id_utilisateur, PDO::PARAM_INT);
+        $requete->execute();
+        
 
         return $requete->fetchAll(PDO::FETCH_ASSOC);
     }

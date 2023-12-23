@@ -10,7 +10,7 @@ $authentification->handleSignUp();
 $authentification->handleSignIn();
 ?>
 
-./
+
 
 
 <!DOCTYPE html>
@@ -26,7 +26,7 @@ $authentification->handleSignIn();
 <body class="bg-[#7393B3] h-screen flex flex-col items-center justify-center">
 <div >
     <a href="Dashboard.php" >
-    <img src="./Images/Logo.png" class="w-40 mx-auto mb-10" alt="dataware Logo" />
+    <!-- <img src="./Images/Logo.png" class="w-40 mx-auto mb-10" alt="dataware Logo" /> -->
     </a>
 </div>
 

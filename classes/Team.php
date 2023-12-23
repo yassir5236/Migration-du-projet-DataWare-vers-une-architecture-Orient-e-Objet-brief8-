@@ -94,6 +94,36 @@ class Team {
     }
     
 
+
+
+    public function getEquipesScrumByUserId(){        // afficher membre equipe pour scrum
+    if(!isset($_SESSION['utilisateur']['id'])){
+        header("Location:../Deconnexion.php ");
+        $id_utilisateur = $_SESSION['utilisateur']['id'];
+    }
+    
+    
+    
+    // $sql = "select nom,email,statut from utilisateur where role='user' ";
+    // $requete = $this->db->prepare($sql);
+    //     $requete->bindParam(1, $id_utilisateur, PDO::PARAM_INT);
+    //     $requete->execute();
+
+
+        $sql = "SELECT nom, email, statut FROM utilisateur WHERE role='user' ";
+        $requete = $this->db->prepare($sql);
+        // Bind the parameter using named placeholder
+        
+        $requete->execute();
+
+    return $requete->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+
+
+
+
     public function createTeam($name) {
         // Logique de création d'équipe
     }

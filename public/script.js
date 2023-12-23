@@ -15,7 +15,7 @@ if (confirmation) {
     formData.append('projectId', projectId);
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'Projet.php', true);
+    xhr.open('POST', '../owner/projet.php', true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
             console.log(xhr.responseText);
@@ -118,4 +118,6 @@ projectForm.addEventListener('submit', (event) => {
     projectModal.classList.add('hidden');
 });
 }
+
+
 
