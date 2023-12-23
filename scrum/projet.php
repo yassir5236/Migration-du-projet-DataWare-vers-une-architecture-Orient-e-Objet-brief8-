@@ -7,7 +7,7 @@ include("../classes/Project.php");
 
 // Create a PDO instance (assuming $conn is your PDO connection)
 
-$userProjects = new Project();
+$userProjects = new Project(null,null,null,null,null);
 
 // Get user projects using the class method
 $resultats = $userProjects->getProjects();

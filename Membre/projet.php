@@ -9,9 +9,8 @@ include("../classes/Project.php"); // Ajoutez l'inclusion de la classe Projet
 
 
 // Instanciation de la classe Database
-$database = new Database();
 
-$projetInstance = new Project($database); // Instanciation de la classe Projet avec la connexion PDO
+$projetInstance = new Project(null,null,null,null,null); // Instanciation de la classe Projet avec la connexion PDO
 
 $id_utilisateur = $_SESSION['utilisateur']['id'];
 

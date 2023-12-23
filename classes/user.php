@@ -13,21 +13,19 @@ class User {
     
     
 
-    public function __construct(Database $database,) {
-        $this->database = $database;
+    public function __construct() {
+        $this->database = Database::getInstance()->getconnection();
     }
 
 
   
 
     public function handleSignUp() {
-        $conn = $this->database->getConnection();
-
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submitSignUp'])) {
             $nom = $_POST['newname'];
             $email = $_POST['newEmail'];
 
-            $requete = $conn->prepare("SELECT email FROM utilisateur WHERE email = ?");
+            $requete = $this->database->prepare("SELECT email FROM utilisateur WHERE email = ?");
             $requete->execute([$email]);
 
             if ($utilisateur = $requete->fetch()) {
@@ -41,14 +39,14 @@ class User {
                 } else {
                     $motDePasseHash = password_hash($motDePasse, PASSWORD_DEFAULT);
 
-                    $requete = $conn->prepare("INSERT INTO utilisateur (nom, email, password, statut, role) VALUES (?, ?, ?, 'actif', 'user')");
+                    $requete = $this->database->prepare("INSERT INTO utilisateur (nom, email, password, statut, role) VALUES (?, ?, ?, 'actif', 'user')");
                     if (!$requete) {
-                        die("Erreur de préparation de la requête : " . $conn->errorInfo()[2]);
+                        die("Erreur de préparation de la requête : " . $this->database->errorInfo()[2]);
                     }
 
                     if ($requete->execute([$nom, $email, $motDePasseHash])) {
                         echo "Inscription réussie !";
-                        header("Location: login.php");
+                        header("Location: index.php");
                     } else {
                         echo "Erreur lors de l'inscription : " . $requete->errorInfo()[2];
                     }
@@ -62,15 +60,14 @@ class User {
 
 
     public function handleSignIn() {
-        $conn = $this->database->getConnection();
 
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submitSignIn'])) {
             $email = $_POST['email'];
             $motDePasse = $_POST['password'];
 
-            $requete = $conn->prepare("SELECT * FROM utilisateur WHERE email = ?");
+            $requete = $this->database->prepare("SELECT * FROM utilisateur WHERE email = ?");
             if (!$requete) {
-                die("Erreur de préparation de la requête : " . $conn->errorInfo()[2]);
+                die("Erreur de préparation de la requête : " . $this->database->errorInfo()[2]);
             }
 
             $requete->execute([$email]);

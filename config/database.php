@@ -1,24 +1,27 @@
 <?php
-
 class Database {
-    private $host = "localhost";
-    private $username = "root";
-    private $password = "";
-    private $dbname = "dataware3";
-    private $conn;
+    private static $instance;
+    private $connection;
 
-    public function __construct() {
+    private function __construct() {
         try {
-            $this->conn = new PDO("mysql:host=$this->host;dbname=$this->dbname", $this->username, $this->password);
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->connection = new PDO("mysql:host=localhost;dbname=dataware3", "root", "");
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            die("La connexion à la base de données a échoué : " . $e->getMessage());
+            // Handle the connection error here
+            die("Connection failed: " . $e->getMessage());
         }
     }
 
+    public static function getInstance() {
+        if (!self::$instance) {
+            self::$instance = new Database();
+        }
+        return self::$instance;
+    }
+
     public function getConnection() {
-        return $this->conn;
+        return $this->connection;
     }
 }
-
 ?>

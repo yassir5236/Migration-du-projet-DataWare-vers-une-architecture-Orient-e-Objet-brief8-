@@ -2,8 +2,8 @@
 
 class Team {
     Private $db;
-    public function __construct(Database $db) {
-        $this->db = $db->getConnection();
+    public function __construct() {
+        $this->db = Database::getInstance()->getconnection();
     }
   
     

@@ -5,35 +5,17 @@
 class ProductOwner extends User {
 
     private $db;
-    public function __construct(Database $db,$id, $username, $password)
+    public function __construct($id, $username, $password)
     {
-        $this->db = $db->getconnection();
+        $this->db = Database::getInstance()->getconnection();
         parent::__construct($id, $username, $password);
     }
-   
-
-
-
-
-    
-   
-
-
 
     public function CreeProjet($project) {
         
     }
-
-
-
     public function ModifierProjet() { // aussi assigner scrum
-
-
     }
-
-
-   
-
     public function deleteProject($projectId)
 {
     $this->db->beginTransaction();

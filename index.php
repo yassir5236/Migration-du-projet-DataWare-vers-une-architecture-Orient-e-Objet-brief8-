@@ -3,8 +3,7 @@ session_start();
 include("config/database.php");
 include("classes/user.php");
 
-$database = new Database();
-$authentification = new User($database);
+$authentification = new User();
 
 $authentification->handleSignUp();
 $authentification->handleSignIn();

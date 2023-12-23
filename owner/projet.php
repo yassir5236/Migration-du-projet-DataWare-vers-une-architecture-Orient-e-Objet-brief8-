@@ -14,7 +14,7 @@ include("../classes/Project.php");
 
 
 
-$projetManager = new Project();              // affichage des des projet pour product owner
+$projetManager = new Project(null,null,null,null,null);              // affichage des des projet pour product owner
 $projets = $projetManager->displayprojects();
 
 
@@ -29,21 +29,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_project'])) {
 
     // Call the updateProject method with the project ID
     $projetManager->updateProject($projectId);
+?>
+    <div id="myModel" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-8 rounded shadow-lg w-96">
+        <div class="flex justify-end w-full">
+            <button id="closeModal" type="button" onclick="toggleModal()"
+                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                data-modal-toggle="crypto-modal">
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+                <span class="sr-only">Close modal</span>
+            </button>
+        </div>
+        <form action="Projet.php" method="post">
+            <input type="text" id="projectIdUpdate" name="projectIdUpdate" value="<?php echo $projectIdUpdate; ?>" hidden>
+            <div class="mb-4">
+                <label for="projectName" class="block text-gray-700 text-sm font-bold mb-2">Nom du
+                    Projet</label>
+                <input type="text" id="projectName" name="projectName" value="<?php echo $projectName; ?>"
+                    class="px-4 py-2 w-full border rounded focus:outline-none focus:border-blue-500">
+            </div>
+
+            <div class="mb-4">
+                <label for="deadline"
+                    class="block text-gray-700 text-sm font-bold mb-2">Deadline</label>
+                <input type="date" id="deadline" name="deadline" value="<?php echo $deadline; ?>"
+                    class="px-4 py-2 w-full border rounded focus:outline-none focus:border-blue-500">
+            </div>
+
+            <div class="mb-4">
+                <label for="scrum_master" class="block text-gray-700 text-sm font-bold mb-2">Scrum
+                    Master</label>
+                <select id="scrum_master" name="scrum_master"
+                    class="px-4 py-2 w-full border rounded focus:outline-none focus:border-blue-500">
+                    <!-- Populate this select box with appropriate data -->
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="description"
+                    class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+                <textarea id="description" name="description" rows="4"
+                    class="px-4 py-2 w-full border rounded focus:outline-none focus:border-blue-500"><?php echo $description; ?></textarea>
+            </div>
+
+            <button type="submit" id="UpdateProjectButton"
+                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue"
+                name="update">Modifier Projet</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleModal() {
+        var modal = document.getElementById("myModel");
+        modal.style.display = "none";
+    }
+</script>
+<?php
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ?>
 
@@ -147,22 +195,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_project'])) {
                                     <td class=\"px-6 py-4 border-b\">{$projet['date_limite']}</td>
                                     <td class=\"px-6 py-4\">
                                                                     <div class=\"flex gap-6\">
-                                                                    <form  method=\"post\" id=\"updateform\">
+                                                                    <form  method=\"post\">
                                                                     <input   type=\"hidden\" name=\"projectId\" value=\"{$projet['id_projet']}\">
                                                                         <button  type=\"submit\" name=\"update_project\" class=\"openModal2\" style=\"cursor: pointer;\">
                                                                             <svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"w-6 h-6\">
                                                                                     <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10\" />
                                                                             </svg>
                                                                         </button>
-                                                                   
-                                                                            <button type='submit' name='delete_project' id=\"deleteButton\" style=\"cursor: pointer;\" onclick=\"confirmDelete(event)\">
-                                                                            <input   type=\"hidden\" name=\"projectId\" value=\"{$projet['id_projet']}\">
-                                                                            <svg   xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\"
-                                                                            stroke-width=\"1.5\" stroke=\"currentColor\" class=\"w-6 h-6\">
-                                                                            <path stroke-linecap=\"round\" stroke-linejoin=\"round\"
-                                                                                d=\"M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0\" />
-                                                                        </svg>
-                                                                        </button>
+                                                            
                                                                         </form>
                                                                         
                                                                 </div>
@@ -249,52 +289,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_project'])) {
     </div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-    <script>
-
-
-        const projectModal = document.getElementById('projectModal');
-        const closeModalButton = document.getElementById('closeModal');
-        const UpdateProjectButton = document.querySelector('#UpdateProjectButton');
-        const addProjectButton = document.querySelector('#addProjectButton');
-        const updateform = document.getElementById('updateform');
-        const openModalButton = document.getElementById('openModal');
-
-        UpdateProjectButton.style.display = 'flex';
-        addProjectButton.style.display = 'none';
-
-        closeModalButton.addEventListener('click', () => {
-            projectModal.classList.add('hidden');
-        });
-
-        openModalButton.addEventListener('click', () => {
-            projectModal.classList.toggle('hidden');
-
-        });
-        // Remplir les champs du formulaire avec les données du projet
-        document.getElementById('projectIdUpdate').value = '<?php echo $projectIdUpdate; ?>';
-
-        document.getElementById('projectName').value = '<?php echo $projectName; ?>';
-        document.getElementById('deadline').value = '<?php echo $deadline; ?>';
-        document.getElementById('scrum_master').value = '<?php echo $scrumMaster; ?>';
-        document.getElementById('description').value = '<?php echo $description; ?>';
-
-
-
-
-        document.getElementById('projectModal').classList.remove('hidden');
-
-    </script>
 
 
 

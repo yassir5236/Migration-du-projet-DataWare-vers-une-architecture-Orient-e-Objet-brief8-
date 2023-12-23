@@ -8,8 +8,7 @@ include("../classes/Team.php");
 // Create a PDO instance (assuming $conn is your PDO connection)
 
 
-$database = new Database();
-$userEquipe = new Team($database);
+$userEquipe = new Team();
 
 // Get user projects using the class method
 

@@ -9,8 +9,7 @@ include("../config/database.php");
 include("../classes/Team.php");
 $id_utilisateur = $_SESSION['utilisateur']['id'];
 
-$database = new Database();
-$projetInstance = new Team($database);
+$projetInstance = new Team();
 
 $resultat = $projetInstance->getEquipesByUserId($id_utilisateur);
 ?>

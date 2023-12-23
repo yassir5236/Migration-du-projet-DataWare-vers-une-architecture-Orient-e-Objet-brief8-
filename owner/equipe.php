@@ -12,12 +12,9 @@ if (!isset($_SESSION['utilisateur']['id'])) {
 include("../config/database.php");
 include("../classes/Team.php");
 
-// Initialisation de la base de données
-$database = new Database();
-$conn = $database->getConnection();
 
 // Initialisation de la classe Equipe
-$equipeManager = new Team($database);
+$equipeManager = new Team();
 
 $equipes = $equipeManager->getAllEquipes();
 
