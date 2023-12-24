@@ -2,14 +2,12 @@
 class Project
 {
 
-
     private $projectId;
     private $projectName;
     private $deadline;
     private $scrumMaster;
     private $description;
     private $db;
-
 
     public function __construct($projectId, $projectName, $deadline, $scrumMaster, $description)
     {
@@ -21,54 +19,145 @@ class Project
         $this->db = Database::getInstance()->getconnection();
     }
 
-    // Add getters and setters as needed
+    // Getters
     public function getProjectId()
     {
         return $this->projectId;
     }
 
+    public function getProjectName()
+    {
+        return $this->projectName;
+    }
+
+    public function getDeadline()
+    {
+        return $this->deadline;
+    }
+
+    public function getScrumMaster()
+    {
+        return $this->scrumMaster;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    // Setters
     public function setProjectId($projectId)
     {
         $this->projectId = $projectId;
     }
 
+    public function setProjectName($projectName)
+    {
+        $this->projectName = $projectName;
+    }
+
+    public function setDeadline($deadline)
+    {
+        $this->deadline = $deadline;
+    }
+
+    public function setScrumMaster($scrumMaster)
+    {
+        $this->scrumMaster = $scrumMaster;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
 
 
-    public function updateProject($projectId)
+    public function getScrumMasters()
+    {
+        $sql = "SELECT id, email FROM utilisateur";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function requestupdateProject($projectId)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_project'])) {
-            $sql = "SELECT * FROM projet WHERE id = ?";
+            $sql = "SELECT  projet.id as id_projet ,
+            projet.nom as nom_projet, description, projet.date_creation as date_creation, date_limite, projet.statut  as statut
+            , utilisateur.email as email_utilisateur FROM `projet` join utilisateur on utilisateur.id= projet.id_user WHERE projet.id = ?";
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(1, $projectId);
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($result) {
-
-                $project = new Project(
-                    $result['id'],
-                    $result['nom'],
-                    $result['date_limite'],
-                    $result['id_user'],
-                    $result['description']
-                );
-                // $projectIdUpdate = $result['id'];
-                // $projectName = $result['nom'];
-                // $deadline = $result['date_limite'];
-                // $scrumMaster = $result['id_user'];
-                // $description = $result['description'];
-                return $project;
-
+                $this->setProjectId($result['id_projet']);
+                $this->setProjectName($result['nom_projet']);
+                $this->setDeadline($result['date_limite']);
+                $this->setScrumMaster($result['email_utilisateur']);
+                $this->setDescription($result['description']);
             } else {
                 echo "No project found with ID " . $projectId;
             }
         }
+
+        return $this;
+
+    }
+    public function updateProject(Project $project)
+    {
+        try {
+            // Prepare the SQL statement
+            $sql = "UPDATE projet 
+                    SET nom = :projectName, 
+                        date_limite = :deadline, 
+                        id_user = :scrumMaster, 
+                        description = :description
+                    WHERE id = :projectId";
+
+            // Prepare the PDO statement
+            $stmt = $this->db->prepare($sql);
+            // Get project properties
+            $projectId = $project->getProjectId();
+            $projectName = $project->getProjectName();
+            $deadline = $project->getDeadline();
+            $scrumMaster = $project->getScrumMaster();
+            $description = $project->getDescription();
+
+            // Bind parameters
+            $stmt->bindParam(':projectName', $projectName, PDO::PARAM_STR);
+            $stmt->bindParam(':deadline', $deadline, PDO::PARAM_STR);
+            $stmt->bindParam(':scrumMaster', $scrumMaster, PDO::PARAM_INT);
+            $stmt->bindParam(':description', $description, PDO::PARAM_STR);
+            $stmt->bindParam(':projectId', $projectId, PDO::PARAM_INT);
+
+            // Execute the statement
+            $stmt->execute();
+
+            // Check if the update was successful
+            if ($stmt->rowCount() > 0) {
+                return true;
+            }
+        } catch (PDOException $e) {
+            echo "Error updating project: " . $e->getMessage();
+        }
+        return false;
     }
 
 
+    public function deleteProject($projectId)
+    {
+        $sql = "DELETE FROM projet WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(1, $projectId);
 
-
-
+        try {
+            $stmt->execute();
+            echo "Project deleted successfully!";
+        } catch (PDOException $e) {
+            echo "Error deleting project: " . $e->getMessage();
+        }
+    }
 
 
 
@@ -143,66 +232,27 @@ class Project
         }
     }
 
-    public function addProject($projectName, $description, $deadline, $scrumMaster)
+    public function addProject($project)
     {
-        $this->db->beginTransaction();
-
         try {
-            $sql = "UPDATE utilisateur SET role='sm' WHERE id=?";
-            $requete = $this->db->prepare($sql);
-            $requete->execute([$scrumMaster]);
+            // Utilisez des paramètres liés pour éviter les injections SQL
+            $stmt = $this->db->prepare("INSERT INTO `projet`(`nom`, `description`, `date_limite`, `statut`, `id_user`)VALUES (:projectName,:description, :deadline,'en cours', :scrumMaster)");
+            $projectName = $project->getProjectName();
+            $deadline = $project->getDeadline();
+            $scrumMaster = $project->getScrumMaster();
+            $description = $project->getDescription();
 
-            $sql = "INSERT INTO projet (nom, description, date_creation, date_limite, statut, id_user) VALUES (?, ?, NOW(), ?,'En cours',?)";
-            $requete = $this->db->prepare($sql);
-            $requete->execute([$projectName, $description, $deadline, $scrumMaster]);
+            $stmt->bindParam(':projectName', $projectName);
+            $stmt->bindParam(':deadline', $deadline);
+            $stmt->bindParam(':scrumMaster', $scrumMaster);
+            $stmt->bindParam(':description', $description);
 
-            $this->db->commit();
-            echo "Projet ajouté avec succès.";
-            header("Location: Projet.php");
-
-            return $requete->fetchAll(PDO::FETCH_ASSOC);
-
+            return $stmt->execute();
         } catch (PDOException $e) {
-            $this->db->rollBack();
+            // Gérez les erreurs ici
             echo "Error: " . $e->getMessage();
+            return false;
         }
-    }
-
-    public function deleteProject()
-    {
-
-         
-
-        // if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_project'])) {
-        //     $this->projectId = $_POST['projectId'];
-        //     // die("HELLO");
-
-        //     // $this->db->beginTransaction();
-
-        //     try {
-        //         // Supprimer les membres de l'équipe associée au projet
-        //         $sql = "DELETE FROM MembreEquipe WHERE id_equipe IN (SELECT id FROM equipe WHERE id_projet = :projectId)";
-        //         $requete = $this->db->prepare($sql);
-        //         $requete->bindParam(':projectId', $projectId, PDO::PARAM_INT);
-        //         $requete->execute();
-    
-        //         // Supprimer les équipes associées au projet
-        //         $sql = "DELETE FROM equipe WHERE id_projet = :projectId";
-        //         $requete = $this->db->prepare($sql);
-        //         $requete->bindParam(':projectId', $projectId, PDO::PARAM_INT);
-        //         $requete->execute();
-    
-        //         // Supprimer le projet lui-même
-        //         $sql = "DELETE FROM projet WHERE id = :projectId";
-        //         $requete = $this->db->prepare($sql);
-        //         $requete->bindParam(':projectId', $projectId, PDO::PARAM_INT);
-        //         $requete->execute();
-
-        //     } catch (PDOException $e) {
-        //         $this->db->rollBack();
-        //         echo "Error: " . $e->getMessage();
-        //     }
-        // }
     }
 
 
@@ -285,7 +335,7 @@ class Project
         $requete = $this->db->prepare($sql);
         $requete->bindParam(1, $id_utilisateur, PDO::PARAM_INT);
         $requete->execute();
-        
+
 
         return $requete->fetchAll(PDO::FETCH_ASSOC);
     }
