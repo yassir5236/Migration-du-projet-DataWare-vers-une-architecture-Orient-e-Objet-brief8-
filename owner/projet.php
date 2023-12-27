@@ -385,7 +385,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteproject'])) {
     </script>
 
     <?php
-    $stmt->closeCursor();
+    
     ?>
 </body>
 

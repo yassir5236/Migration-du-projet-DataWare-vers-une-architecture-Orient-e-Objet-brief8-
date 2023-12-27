@@ -7,25 +7,34 @@ event.stopPropagation();
 
 var confirmation = window.confirm('Are you sure you want to delete this project?');
 
+
 if (confirmation) {
     var projectId = event.target.closest('tr').dataset.projectId;
+    console.log("Project ID: " + projectId);  // Ajout pour déboguer
 
-    // Modification ici : utilisez FormData pour envoyer les données
     var formData = new FormData();
     formData.append('projectId', projectId);
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '../owner/projet.php', true);
+    
+    // Ajout de l'entête pour FormData
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
     xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            console.log(xhr.responseText);
-            window.location.reload(); // Décommentez cette ligne pour recharger la page si nécessaire
+        if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+                console.log(xhr.responseText);
+                window.location.reload(); // Décommentez cette ligne pour recharger la page si nécessaire
+            } else {
+                console.error("Error in request: " + xhr.status);
+            }
         }
     };
 
-    // Modification ici : envoyez formData au lieu de la chaîne de requête
     xhr.send(formData);
 }
+
 }
 function confirmDeleteTeam(event) {
 var confirmation = window.confirm('Are you sure you want to delete this team?');

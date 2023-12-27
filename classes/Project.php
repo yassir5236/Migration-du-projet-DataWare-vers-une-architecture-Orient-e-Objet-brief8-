@@ -326,7 +326,7 @@ class Project
 
         $id_utilisateur = $_SESSION['utilisateur']['id'];
 
-        $sql = "SELECT projet.nom as nom_projet, description, projet.date_creation as date_creation, date_limite, projet.statut as statut, equipe.nom AS nom_equipe 
+        $sql = "SELECT projet.id as id_projet, projet.nom as nom_projet, description, projet.date_creation as date_creation, date_limite, projet.statut as statut, equipe.nom AS nom_equipe 
                 FROM projet 
                 JOIN utilisateur ON utilisateur.id = projet.id_user 
                 LEFT JOIN equipe ON projet.id = equipe.id_projet 
